@@ -64,3 +64,12 @@ func AssertBody(regex string) goreq.AfterResponseHandler {
 
 	}
 }
+
+func AssertStatus(status int) goreq.AfterResponseHandler {
+	return func(resp *http.Response) {
+		if status != resp.StatusCode {
+			fmt.Printf("Error: invalid status\n")
+			return
+		}
+	}
+}
