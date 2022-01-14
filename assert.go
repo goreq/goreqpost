@@ -10,7 +10,10 @@ import (
 	"github.com/spyzhov/ajson"
 )
 
-type JSONChecker func(node []*ajson.Node)
+type JSON struct {
+	*ajson.Node
+}
+type JSONChecker func(node []*JSON)
 
 func AssertJSON(jsonPath string, checker JSONChecker) goreq.AfterResponseHandler {
 	return func(resp *http.Response) {
@@ -31,7 +34,11 @@ func AssertJSON(jsonPath string, checker JSONChecker) goreq.AfterResponseHandler
 			return
 		}
 
-		checker(nodes)
+		nodesToJson := make([]*JSON, len(nodes))
+		for _, node := range nodes {
+			nodesToJson = append(nodesToJson, &JSON{node})
+		}
+		checker(nodesToJson)
 
 	}
 }
