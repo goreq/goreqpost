@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 
 	"github.com/goreq/goreq"
 	"github.com/spyzhov/ajson"
@@ -31,6 +32,28 @@ func AssertJSON(jsonPath string, checker JSONChecker) goreq.AfterResponseHandler
 		}
 
 		checker(nodes)
+
+	}
+}
+
+func AssertBody(regex string) goreq.AfterResponseHandler {
+	return func(resp *http.Response) {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Printf("Error: %s\n", err.Error())
+			return
+		}
+
+		matched, err := regexp.MatchString(regex, string(body))
+		if err != nil {
+			fmt.Printf("Error: %s\n", err.Error())
+			return
+		}
+
+		if !matched {
+			fmt.Printf("Error: invalid body\n")
+			return
+		}
 
 	}
 }
